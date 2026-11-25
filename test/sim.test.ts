@@ -33,7 +33,8 @@ const dropped = (cs: SampleChunk[]) => cs.reduce((a, r) => a + (r.dropped ?? 0),
 const rows = (cs: SampleChunk[], i: number) => cs.flatMap((r) => Array.from(r.data[i]));
 
 test('every simulator has a driver, and options come from a plain config', () => {
-  for (const id of SIMULATED_DRIVERS) assert.ok(driverFor(id, ({ 'apple-health': 'healthkit', 'health-connect': 'health-connect' } as Record<string, never>)[id] ?? (id.startsWith('openbci-cyton') ? 'web-serial' : 'web-bluetooth')), id);
+  const stores: Record<string, 'healthkit' | 'health-connect'> = { 'apple-health': 'healthkit', 'health-connect': 'health-connect' };
+  for (const id of SIMULATED_DRIVERS) assert.ok(driverFor(id, stores[id] ?? (id.startsWith('openbci-cyton') ? 'web-serial' : 'web-bluetooth')), id);
   assert.deepEqual(simOptions({ seed: '7', speed: 2, lossRate: 3, badKind: 'flat' }), { seed: 7, speed: 2, disconnectAfterS: undefined, lossRate: undefined, stuckChannel: undefined, badChannel: undefined, badKind: 'flat', start: undefined, manual: undefined });
   assert.throws(() => simulatorFor('no-such-driver'), /no simulator/);
 });
@@ -43,7 +44,7 @@ test('the EEG looks like EEG: alpha rises with the eyes closed, mostly at the ba
   const s = Array.from({ length: 250 * 90 }, () => m.next());
   const sec = (i: number, c: number) => s.slice(i * 250, (i + 1) * 250).map((x) => x[c]);
   const O1 = CYTON_NAMES.indexOf('O1'), Fp1 = CYTON_NAMES.indexOf('Fp1');
-  const closed = [], open = [];
+  const closed: number[] = [], open: number[] = [];
   for (let i = 1; i < 89; i++) (m.eyesClosed(i + 0.5) && m.eyesClosed(i) && m.eyesClosed(i + 0.99) ? closed : !m.eyesClosed(i) && !m.eyesClosed(i + 0.99) ? open : []).push(i);
   assert.ok(closed.length > 5 && open.length > 5);
   const alpha = (secs: number[], c: number) => secs.reduce((a, i) => a + bandPowers(sec(i, c), 250).alpha, 0) / secs.length;
