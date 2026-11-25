@@ -59,17 +59,19 @@ in this folder and open `/pair-in-chrome.html` in Chrome. Its Demo button runs a
 | `openbci-ganglion` | OpenBCI Ganglion, 4 EEG at 200 Hz | Web Bluetooth | spec | packets built from the Ganglion Data Format (18/19-bit deltas); no recorded Ganglion bytes tested yet |
 | `ble-heart-rate` | any standard heart-rate sensor (0x180D) | Web Bluetooth | loopback | every flag of the Heart Rate Service spec, and a session |
 | `polar-h10` | Polar H10: ECG 130 Hz, accelerometer, HR, RR | Web Bluetooth (Polar PMD) | loopback | commands and frames per polar-ble-sdk, a session against a simulated strap |
+| `apple-health` | Apple Health (HealthKit) on an iPhone | HealthKit, through the app's native plugin | none | the record mapping is tested with a fake store; the Swift plugin is not compiled yet |
+| `health-connect` | Health Connect on Android | Health Connect, through the app's native plugin | spec | the record mapping is tested with a fake store; the Kotlin plugin compiles, not yet run on a phone |
 | `file-edf` | EDF, EDF+, BDF, BDF+ | file | loopback | files built from the EDF+ spec and BioSemi's 24-bit layout |
 | `file-fit` | Garmin FIT (watches, bike computers) | file | loopback | a file built from the FIT protocol: definitions, compressed timestamps, big-endian messages |
 | `file-gpx` | GPX 1.1 with Garmin's TrackPointExtension | file | loopback | a track read through the driver |
 | `file-apple-health-export` | Apple Health `export.xml`, streamed | file | loopback | a snippet with its DOCTYPE, records, metadata, sleep and a workout |
 | `file-csv` | any CSV with a time column | file | loopback | a regular and an irregular file |
 
-Not built here: `exocortex-cap` (a descriptor; the Exocortex app implements its hub link), and the phone's
-HealthKit and Health Connect drivers (registered by the app that bridges them). The catalog
+Not built here: `exocortex-cap` (a descriptor; the Exocortex app implements its hub link and registers it). The
+health-store drivers need a host that hands them a `HealthStoreTransport` (a native plugin). The catalog
 ([`src/catalog.ts`](src/catalog.ts)) lists every device family we know of, with the best route for a host and a
-sentence: `searchCatalog('oura ring', 'chrome-desktop')` says "Works through Apple Health on your iPhone: use the
-iPhone app"; a family with no route says why it is not supported yet.
+sentence: on a computer, `searchCatalog('oura ring', 'chrome-desktop')` says "Works through Health Connect on your
+Android phone: use the Android app"; a family with no route says why it is not supported yet.
 
 Also here: `regionOf('Fp1')` (a 10-20 name to frontal, central, parietal, occipital or temporal) and
 `bandPowers(samples, fs)` (delta to gamma, Hann window and FFT) for summarising any board's EEG.

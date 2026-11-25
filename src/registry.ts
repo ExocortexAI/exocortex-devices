@@ -1,5 +1,5 @@
-// The drivers this package ships, and the lookup a host uses to open a paired device. The Exocortex cap's driver
-// and the phone's health-store drivers are registered by the code that implements them (`register`).
+// The drivers this package ships, and the lookup a host uses to open a paired device. The Exocortex cap's driver is
+// registered by the app that implements it (`register`).
 
 import type { Driver, TransportKind } from './contract.ts';
 import { openbciCyton } from './drivers/openbci-cyton.ts';
@@ -12,15 +12,18 @@ import { fit } from './drivers/fit.ts';
 import { gpx } from './drivers/gpx.ts';
 import { appleHealthExport } from './drivers/apple-health-export.ts';
 import { csv } from './drivers/csv.ts';
+import { appleHealthDriver } from './drivers/apple-health.ts';
+import { healthConnectDriver } from './drivers/health-connect.ts';
 
 // each driver is typed by its own transport; the registry holds them as the contract's general Driver
 export const builtinDrivers: readonly Driver[] = [
-  openbciCyton, openbciCytonDaisy, openbciGanglion, bleHeartRate, polarH10, edf, fit, gpx, appleHealthExport, csv,
+  openbciCyton, openbciCytonDaisy, openbciGanglion, bleHeartRate, polarH10, appleHealthDriver, healthConnectDriver,
+  edf, fit, gpx, appleHealthExport, csv,
 ] as unknown as Driver[];
 
 const extra: Driver[] = [];
 
-/** add a driver this package does not ship (the cap's, a phone's health store, a manifest's) */
+/** add a driver this package does not ship (the cap's, a manifest's) */
 export function register(d: Driver): void {
   const i = extra.findIndex((x) => x.id === d.id && x.transport === d.transport);
   if (i >= 0) extra[i] = d;

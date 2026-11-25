@@ -20,7 +20,8 @@ test('a family reached through a phone hub says where it works', () => {
   const oura = first('oura ring 4', 'chrome-desktop');
   assert.equal(oura.descriptor.id, 'oura');
   assert.equal(oura.compatibility.status, 'elsewhere');
-  assert.match(oura.compatibility.sentence, /^Works through Apple Health on your iPhone: use the iPhone app/);
+  // Health Connect's route is verified further (spec) than HealthKit's (none), so it is named first
+  assert.equal(oura.compatibility.sentence, 'Works through Health Connect on your Android phone: use the Android app');
   assert.equal(first('oura', 'ios').compatibility.sentence, 'Works through Apple Health on your iPhone');
   assert.equal(first('oura', 'android').compatibility.sentence, 'Works through Health Connect on your Android phone');
 });
@@ -56,5 +57,5 @@ test('the registry finds each built-in driver by descriptor and transport', () =
   assert.equal(driverFor('polar-h10', 'web-serial'), null);
   // every route this package names as its own has a driver here
   const mine = new Set(builtinDrivers.map((d) => d.id));
-  for (const d of catalog) for (const r of d.routes) if (r.driver && !['apple-health', 'health-connect', 'exocortex-cap'].includes(r.driver)) assert.ok(mine.has(r.driver), `${d.id} → ${r.driver}`);
+  for (const d of catalog) for (const r of d.routes) if (r.driver && r.driver !== 'exocortex-cap') assert.ok(mine.has(r.driver), `${d.id} → ${r.driver}`);
 });

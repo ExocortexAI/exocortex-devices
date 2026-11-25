@@ -15,6 +15,8 @@ import { gpxDescriptor } from './drivers/gpx.ts';
 import { appleHealthExportDescriptor } from './drivers/apple-health-export.ts';
 import { csvDescriptor } from './drivers/csv.ts';
 import { exocortexCapDescriptor } from './drivers/exocortex-cap.ts';
+import { appleHealthDescriptor } from './drivers/apple-health.ts';
+import { healthConnectDescriptor } from './drivers/health-connect.ts';
 
 // ---------------------------------------------------------------------------------------------------------------
 // routes a catalog entry reuses
@@ -26,12 +28,12 @@ const BROWSERS: Host[] = ['any-browser', 'chrome-desktop', 'desktop-app', 'ios',
 /** Apple Health on the iPhone app: the vendor's app writes to it, the apple-health driver reads it */
 const viaHealthKit = (freshness = 'after the vendor app syncs to Apple Health'): Route => ({
   transport: 'healthkit', hosts: ['ios'], driver: 'apple-health', needs: ['the Exocortex iPhone app', 'the vendor app set to share with Apple Health'],
-  freshness, dataLeaves: 'never', verified: 'none',
+  freshness, dataLeaves: 'never', verified: appleHealthDescriptor.routes[0].verified,
 });
 /** Health Connect on Android: the vendor's app writes to it, the health-connect driver reads it */
 const viaHealthConnect = (freshness = 'after the vendor app syncs to Health Connect'): Route => ({
   transport: 'health-connect', hosts: ['android'], driver: 'health-connect', needs: ['the Exocortex Android app', 'the vendor app set to share with Health Connect'],
-  freshness, dataLeaves: 'never', verified: 'none',
+  freshness, dataLeaves: 'never', verified: healthConnectDescriptor.routes[0].verified,
 });
 const viaFile = (driver: string, verified: Verified, needs: string[]): Route => ({
   transport: 'file', hosts: BROWSERS, driver, needs, freshness: 'when you import a file', dataLeaves: 'never', verified,
@@ -293,7 +295,7 @@ const familyEntries: Descriptor[] = [
 /** the descriptors whose driver this package (or the app) implements */
 export const builtinDescriptors: Descriptor[] = [
   exocortexCapDescriptor, cytonDescriptor(false), cytonDescriptor(true), ganglionDescriptor, bleHeartRateDescriptor, polarH10Descriptor,
-  appleHealthExportDescriptor, fitDescriptor, gpxDescriptor, edfDescriptor, csvDescriptor,
+  appleHealthDescriptor, healthConnectDescriptor, appleHealthExportDescriptor, fitDescriptor, gpxDescriptor, edfDescriptor, csvDescriptor,
 ];
 
 export const catalog: Descriptor[] = [...builtinDescriptors, ...familyEntries];
