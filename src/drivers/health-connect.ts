@@ -20,7 +20,7 @@ export const healthConnectDescriptor: Descriptor = {
   ],
   routes: [{
     transport: 'health-connect', hosts: ['android'], driver: 'health-connect',
-    needs: ['the Exocortex app on Android 8 or later', 'Health Connect (part of Android 14 and later; an app from Play before it)', 'read access, given in Health Connect'],
+    needs: ['the Exocortex app on Android 9 or later', 'Health Connect (part of Android 14 and later; an app from Play before it)', 'read access, given in Health Connect'],
     freshness: 'when the app is open',
     dataLeaves: 'never',
     // the Kotlin plugin compiles in the app's Gradle build; it has not run on a phone with Health Connect yet
