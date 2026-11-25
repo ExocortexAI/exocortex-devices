@@ -59,6 +59,7 @@ in this folder and open `/pair-in-chrome.html` in Chrome. Its Demo button runs a
 | `openbci-ganglion` | OpenBCI Ganglion, 4 EEG at 200 Hz | Web Bluetooth | spec | packets built from the Ganglion Data Format (18/19-bit deltas); no recorded Ganglion bytes tested yet |
 | `ble-heart-rate` | any standard heart-rate sensor (0x180D) | Web Bluetooth | loopback | every flag of the Heart Rate Service spec, and a session |
 | `polar-h10` | Polar H10: ECG 130 Hz, accelerometer, HR, RR | Web Bluetooth (Polar PMD) | loopback | commands and frames per polar-ble-sdk, a session against a simulated strap |
+| `media-audio` | Headphones, earbuds, clip and USB mics: 16 kHz audio clips, a level meter, the route | `MediaTransport` (getUserMedia) | loopback | inputs, the level, clips only while the host admits them, a route change and a lost input, against a fake audio input |
 | `apple-health` | Apple Health (HealthKit) on an iPhone | HealthKit, through the app's native plugin | none | the record mapping is tested with a fake store; the Swift plugin is not compiled yet |
 | `health-connect` | Health Connect on Android | Health Connect, through the app's native plugin | spec | the record mapping is tested with a fake store; the Kotlin plugin compiles, not yet run on a phone |
 | `file-edf` | EDF, EDF+, BDF, BDF+ | file | loopback | files built from the EDF+ spec and BioSemi's 24-bit layout |
