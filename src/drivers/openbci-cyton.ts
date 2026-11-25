@@ -171,6 +171,7 @@ async function openCyton(t: ByteTransport, ctx: OpenContext, daisy: boolean, des
   let closing = false;
   let streaming = false;
   let lastSample = -1;
+  let lastPair = -1;               // the board's sample number of the last whole Daisy pair
   let pendingBoard: CytonPacket | null = null;
   let firstPair = true;
   let rows: number[][] = [];
@@ -216,10 +217,7 @@ async function openCyton(t: ByteTransport, ctx: OpenContext, daisy: boolean, des
   };
 
   const onPacket = (k: CytonPacket) => {
-    if (lastSample >= 0) {
-      const gap = (k.sample - lastSample - 1) & 0xff;
-      if (gap) dropped += daisy ? Math.floor(gap / 2) : gap;
-    }
+    if (!daisy && lastSample >= 0) dropped += (k.sample - lastSample - 1) & 0xff;
     lastSample = k.sample;
     const uv = k.counts.map((c) => c * scale);
     if (!daisy) { addSample(uv, k.accel); return; }
@@ -227,6 +225,9 @@ async function openCyton(t: ByteTransport, ctx: OpenContext, daisy: boolean, des
     const board = pendingBoard;                                     // even: the Daisy's 9-16, paired with the odd before
     pendingBoard = null;
     if (!board || ((board.sample + 1) & 0xff) !== k.sample) return;  // half a pair: drop it
+    // a 125 Hz sample is a pair: the pairs missing between this one and the last whole one were lost
+    if (lastPair >= 0) dropped += Math.max(0, (((board.sample - lastPair) & 0xff) >> 1) - 1);
+    lastPair = board.sample;
     if (firstPair) { firstPair = false; return; }                   // the first average has nothing before it
     addSample([...board.counts.map((c) => c * scale), ...uv], board.accel ?? k.accel);
   };
@@ -297,6 +298,7 @@ async function openCyton(t: ByteTransport, ctx: OpenContext, daisy: boolean, des
       throw e;
     }
     lastSample = -1;
+    lastPair = -1;
     pendingBoard = null;
     firstPair = true;
     mode = 'stream';

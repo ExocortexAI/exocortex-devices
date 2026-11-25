@@ -76,6 +76,41 @@ Android phone: use the Android app"; a family with no route says why it is not s
 Also here: `regionOf('Fp1')` (a 10-20 name to frontal, central, parietal, occipital or temporal) and
 `bandPowers(samples, fs)` (delta to gamma, Hann window and FFT) for summarising any board's EEG.
 
+## Simulators
+
+`src/sim/` has a simulated device for each live driver and for both health stores, so you can develop against the
+whole contract with no hardware. Each one speaks its device's real protocol over a memory transport, and the real
+driver reads it: the simulators test the drivers' sessions, not a shortcut around them.
+
+```ts
+import { simulatorFor, openbciCytonDaisy } from '@exocortex/devices';
+
+const sim = simulatorFor('openbci-cyton-daisy', { seed: 7, lossRate: 0.01 });
+const conn = await openbciCytonDaisy.open(sim.transport, ctx);   // the ctx of "Pair a board" above
+await conn.start();                                              // ... later: await conn.close(); sim.stop();
+```
+
+| driver | what the simulator does |
+|---|---|
+| `openbci-cyton` | answers `v` with the v3 banner (`Firmware: v3.1.2`, `$$$`), `b` / `s`, `c` / `C`; 33-byte packets at 250 Hz with the sample counter; the accelerometer in every tenth packet |
+| `openbci-cyton-daisy` | the banner names the Daisy; the board's channels on odd sample numbers and the Daisy's on even ones: 16 channels at 125 Hz |
+| `openbci-ganglion` | GATT 0xFE84: a raw packet, then 19-bit delta packets (18-bit with the accelerometer) at 100 a second; `z` sends each contact's ohms |
+| `ble-heart-rate` | 0x2A37 once a second with the rate and the RR intervals of the beats in it; battery 87 % |
+| `polar-h10` | the PMD control point answers; ECG frames of 73 samples at 130 Hz and accelerometer frames of 36 samples at 200 Hz, stamped in ns; heart rate as above |
+| `apple-health`, `health-connect` | a `HealthStoreTransport`: 30 days of heart rate, HRV, resting rate, steps, energy, distance, sleep stages, workouts, SpO2, breathing rate, wrist temperature, VO2 max (and a saved ECG on Apple Health), each store's own shapes, uuids and anchors; a workout is deleted a minute after the start |
+
+The signals: EEG as a 1/f background, a posterior alpha rhythm near 10 Hz that rises in the "eyes closed" stretches,
+blinks on Fp1/Fp2, 60 Hz mains; ECG with P, QRS and T waves around beats whose RR varies with breathing; heart rate
+following a day's rhythm (lower asleep, higher in a workout).
+
+Options (`SimOptions`, and `SIM_SETTINGS` as fields for a settings page; `simulatorSettings(id)` lists those a
+simulator reads): `seed` (the same seed, the same samples), `speed` (simulated seconds per second),
+`disconnectAfterS` (the link is lost: Cyton and Ganglion report `unknown`, the straps `stale`, a store an `error`),
+`lossRate` (packets lost; the Cyton, the Ganglion and the H10 count them as `dropped`, the heart-rate service has no
+counter), `stuckChannel`, `badChannel` with `badKind` (`railed` or `flat`), `start` (the simulated clock's start)
+and `manual` (no timers: move the clock with `step(ms)`, as `test/sim.test.ts` does). A simulator is not hardware:
+no route's `verified` rises because a simulator ran.
+
 ## Add a driver
 
 1. Write the descriptor: channels with units and rates, actions, one route with `verified: 'none'`.

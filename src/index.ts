@@ -32,3 +32,9 @@ export { appleHealthExport, readHealthExport, parseHealthDate, appleHealthExport
 export { csv, readCsv, csvFields, csvDescriptor } from './drivers/csv.ts';
 export { exocortexCapDescriptor } from './drivers/exocortex-cap.ts';
 export { fileFrom, stableId, uuid } from './util.ts';
+
+export {
+  simulatorFor, simulatorSettings, hasSimulator, SIMULATED_DRIVERS, SIM_SETTINGS, simOptions,
+  simulateCyton, simulateGanglion, simulateHeartRate, simulatePolarH10, simulateHealthStore, EegModel, HeartModel, ecgAt,
+} from './sim/index.ts';
+export type { SimOptions, Simulator, HealthSimOptions } from './sim/index.ts';

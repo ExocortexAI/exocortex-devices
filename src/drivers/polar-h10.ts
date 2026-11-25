@@ -115,9 +115,13 @@ async function openPolar(t: GattTransport, ctx: OpenContext): Promise<Connection
     const tsMs = Number(ts) / 1e6;
     const now = ctx.now();
     if (offsetMs === null) offsetMs = now - tsMs;
-    // spacing from the previous frame when there is one, else from the nominal rate
-    const dt = prev !== undefined && ts > prev ? (Number(ts - prev) / 1e6) / n : 1000 / rateHz;
-    return { t0: tsMs + offsetMs - dt * (n - 1), receivedAt: now, rate: 1000 / dt };
+    // spacing from the previous frame when there is one, else from the nominal rate. A gap of more than half a
+    // frame's worth of samples is frames lost on the way: counted, and the nominal spacing kept
+    const nominal = 1000 / rateHz;
+    let dt = prev !== undefined && ts > prev ? (Number(ts - prev) / 1e6) / n : nominal;
+    let dropped = 0;
+    if (prev !== undefined && dt > nominal * 1.5) { dropped = Math.max(0, Math.round(Number(ts - prev) / 1e6 / nominal) - n); dt = nominal; }
+    return { t0: tsMs + offsetMs - dt * (n - 1), receivedAt: now, rate: 1000 / dt, dropped };
   };
 
   const onData = (v: DataView) => {
@@ -125,10 +129,10 @@ async function openPolar(t: GattTransport, ctx: OpenContext): Promise<Connection
     if (!f) return;
     if (f.type === 'ecg' && f.uv.length) {
       const s = sampleTimes('ecg', f.timestampNs, f.uv.length, 130);
-      emit(chunk('ecg', p(), { t0: s.t0, receivedAt: s.receivedAt, clock: 'device', uncertaintyMs: 100 }, 130, ['ECG'], 'uV', [Float32Array.from(f.uv)]));
+      emit(chunk('ecg', p(), { t0: s.t0, receivedAt: s.receivedAt, clock: 'device', uncertaintyMs: 100 }, 130, ['ECG'], 'uV', [Float32Array.from(f.uv)], s.dropped ? { dropped: s.dropped } : undefined));
     } else if (f.type === 'acc' && f.mg.length) {
       const s = sampleTimes('acc', f.timestampNs, f.mg.length, 200);
-      emit(chunk('accel', p(), { t0: s.t0, receivedAt: s.receivedAt, clock: 'device', uncertaintyMs: 100 }, 200, ['x', 'y', 'z'], 'mg', columns(f.mg, 3)));
+      emit(chunk('accel', p(), { t0: s.t0, receivedAt: s.receivedAt, clock: 'device', uncertaintyMs: 100 }, 200, ['x', 'y', 'z'], 'mg', columns(f.mg, 3), s.dropped ? { dropped: s.dropped } : undefined));
     }
   };
   const onControl = (v: DataView) => {
