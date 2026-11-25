@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pair a device</title>
+  <style>
+    :root { --bg: #fbfaf7; --ink: #1d1d1b; --muted: #6b6a66; --line: #dedbd3; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #141413; --ink: #ecebe6; --muted: #9a9993; --line: #33322f; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; }
+    main { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    p { margin: 0 0 16px; color: var(--muted); }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    select, button { font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    canvas { width: 100%; height: 360px; border: 1px solid var(--line); border-radius: 8px; display: block; }
+    #status { margin-top: 12px; color: var(--ink); }
+    ul { list-style: none; padding: 0; margin: 8px 0 0; font: 13px/1.6 ui-monospace, monospace; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Pair a device</h1>
+    <p>Choose a driver, press Pair, and pick the device in Chrome's chooser. Nothing leaves this page.</p>
+    <div class="bar">
+      <select id="driver" aria-label="Driver"></select>
+      <button id="pair">Pair</button>
+      <button id="demo">Demo (no hardware)</button>
+      <button id="stop" disabled>Stop</button>
+    </div>
+    <canvas id="plot"></canvas>
+    <p id="status">Not connected.</p>
+    <ul id="events"></ul>
+  </main>
+  <script type="module" src="./pair-in-chrome.ts"></script>
+</body>
+</html>

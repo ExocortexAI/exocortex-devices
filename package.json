@@ -4,6 +4,14 @@
   "description": "Pair any body device, health source or custom sensor through one contract: descriptors, drivers, transports and records with provenance. OpenBCI, BLE heart rate, Polar H10, HealthKit, Health Connect, files.",
   "license": "Apache-2.0",
   "type": "module",
+  "sideEffects": false,
   "exports": { ".": "./src/index.ts", "./*": "./src/*" },
-  "scripts": { "test": "node --test test/*.test.ts" }
+  "files": ["src", "examples", "README.md", "CONTRIBUTING.md", "LICENSE"],
+  "keywords": ["eeg", "openbci", "web-serial", "web-bluetooth", "heart-rate", "polar", "edf", "fit", "gpx", "apple-health", "wearables"],
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "check": "tsc --noEmit -p .",
+    "example": "vite examples"
+  }
 }

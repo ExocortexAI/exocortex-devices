@@ -1,4 +1,4 @@
-// Every family of the device research's matrix (docs/research/wearables-2026-11-25.md in the Exocortex repo) as a
+// Every family of Exocortex's wearables research (November 2026) as a
 // Descriptor, so a person can search a model and learn what works on the computer or phone in front of them. A route
 // with a driver is built; a route without one is a candidate, with the reason it is not supported yet. Nothing here
 // claims more than its route's `verified` says: a family reached only through a hub (Apple Health, Health Connect)
