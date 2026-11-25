@@ -240,7 +240,35 @@ export interface FileTransport {
   chunks(): AsyncIterable<Uint8Array>;
 }
 
-export type Transport = ByteTransport | GattTransport | HealthStoreTransport | FileTransport;
+/**
+ * The system's audio inputs (getUserMedia in a page): a headset, earbuds, a clip mic's receiver, a USB mic. The host
+ * asks for the microphone permission; the transport lists the inputs, opens one, and says when the list changes (a
+ * headset connected or gone). ./transports/web-media.ts is the page's; ./transports/memory.ts has a fake one.
+ */
+export interface MediaTransport {
+  kind: 'media';
+  label: string;
+  /** the audio inputs the system offers now; `id` 'default' is the system's own choice */
+  inputs(): Promise<AudioInputInfo[]>;
+  /** open one input (or the system default) as mono PCM at `sampleRate` */
+  open(o: { input?: string; sampleRate: number }): Promise<AudioInput>;
+  /** called when the inputs change (a headset joined or left); returns the unsubscribe */
+  onChange(f: () => void): () => void;
+}
+export interface AudioInputInfo { id: string; label: string; group?: string }
+/** one open audio input */
+export interface AudioInput {
+  id: string;
+  label: string;                 // the route as the system names it: "AirPods Pro", "USB Audio Device"
+  sampleRate: number;
+  /** PCM blocks, mono float32 in -1..1, until close() */
+  read(onBlock: (pcm: Float32Array) => void): void;
+  /** the input ended by itself (the headset was taken out, unplugged, or the permission revoked) */
+  onEnded(f: () => void): void;
+  close(): Promise<void>;
+}
+
+export type Transport = ByteTransport | GattTransport | HealthStoreTransport | FileTransport | MediaTransport;
 
 /** the state of one open connection. `unknown`: a link was lost while the device may still be doing something. */
 export type ConnState = 'idle' | 'connecting' | 'streaming' | 'stale' | 'unknown' | 'revoked' | 'error' | 'closed';
@@ -266,6 +294,17 @@ export interface OpenContext {
   emit(r: DeviceRecord): void;
   status(s: Status): void;
   now(): number;
+  /**
+   * Display only, never stored: a level (0..1) of a channel now, for a meter on the device's page (a microphone's
+   * loudness). A host may leave it out or drop it.
+   */
+  meter?(channel: string, level: number): void;
+  /**
+   * Whether the host keeps this device's sample and media records now (a recording session that names it). A driver
+   * that would buffer something sensitive (a microphone's audio) asks first and keeps nothing while it is false.
+   * Absent: the host decides record by record.
+   */
+  admits?(): boolean;
 }
 
 /** an open device. Every method may be called more than once; stop() after a lost link records `unknown`. */

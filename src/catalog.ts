@@ -17,6 +17,7 @@ import { csvDescriptor } from './drivers/csv.ts';
 import { exocortexCapDescriptor } from './drivers/exocortex-cap.ts';
 import { appleHealthDescriptor } from './drivers/apple-health.ts';
 import { healthConnectDescriptor } from './drivers/health-connect.ts';
+import { headsetDescriptor, clipMicDescriptor } from './drivers/media-audio.ts';
 
 // ---------------------------------------------------------------------------------------------------------------
 // routes a catalog entry reuses
@@ -76,14 +77,7 @@ const familyEntries: Descriptor[] = [
       notYet('native-sdk', ['ios'], 'SensorKit needs Apple\'s approved research access.', 'never'),
     ],
   }),
-  entry({
-    id: 'headset', name: 'Headphones and earbuds', vendor: 'Apple AirPods, Beats, Bose, Sony, Samsung Galaxy Buds, Google Pixel Buds, Jabra, Shokz, Soundcore, Xiaomi, boAt',
-    family: 'headset', placement: 'ear', priority: 'P0',
-    models: ['AirPods Pro 3', 'AirPods 4', 'Powerbeats Pro 2', 'Bose QuietComfort', 'Sony WF-1000XM5', 'Galaxy Buds', 'Pixel Buds', 'Shokz OpenRun', 'open-ear and bone-conduction sets'],
-    about: 'Voice capture and private playback through the system\'s audio route.',
-    channels: AUDIO,
-    routes: [{ transport: 'media', hosts: BROWSERS, needs: ['the headset chosen as the system microphone'], freshness: 'live', dataLeaves: 'never', verified: 'none' }],
-  }),
+  headsetDescriptor,
   entry({
     id: 'airpods-motion', name: 'AirPods and Beats head motion', vendor: 'Apple', family: 'headset', placement: 'ear', priority: 'P1',
     models: ['AirPods Pro', 'AirPods Max', 'AirPods (3rd generation and later)', 'Powerbeats Pro 2'],
@@ -91,13 +85,7 @@ const familyEntries: Descriptor[] = [
     channels: [ch('orientation', 'orientation', 'Head motion', 'samples'), ch('hr', 'hr', 'Heart rate', 'events', { unit: 'bpm', sensitive: 'health' })],
     routes: [viaHealthKit(), notYet('native-sdk', ['ios'], 'the iPhone app does not read Core Motion headphone motion yet.', 'never')],
   }),
-  entry({
-    id: 'clip-mic', name: 'Clip-on microphones', vendor: 'RØDE, DJI, Hollyland', family: 'clip-mic', placement: 'body', priority: 'P0',
-    models: ['RØDE Wireless GO', 'RØDE Wireless Micro', 'DJI Mic 2', 'DJI Mic Mini', 'Hollyland Lark M2'],
-    about: 'A clip mic through its USB receiver or the system audio route.',
-    channels: AUDIO,
-    routes: [{ transport: 'media', hosts: BROWSERS, needs: ['the receiver chosen as the system microphone'], freshness: 'live', dataLeaves: 'never', verified: 'none' }],
-  }),
+  clipMicDescriptor,
   entry({
     id: 'apple-watch', name: 'Apple Watch', vendor: 'Apple', family: 'apple', placement: 'wrist', priority: 'P0',
     models: ['Apple Watch Series 12', 'Apple Watch Ultra', 'Apple Watch SE'],
@@ -335,7 +323,7 @@ function worksSentence(r: Route, host: Host): string {
     case 'healthkit': return 'Works through Apple Health on your iPhone';
     case 'health-connect': return 'Works through Health Connect on your Android phone';
     case 'tcp': return 'Works over Wi-Fi';
-    case 'media': return 'Works as a microphone or camera of this device';
+    case 'media': return r.driver === 'media-audio' ? 'Works as a microphone of this device, through its audio route' : 'Works as a microphone or camera of this device';
     case 'lsl': return 'Works through Lab Streaming Layer in the desktop app';
     default: return `Works over ${r.transport}`;
   }

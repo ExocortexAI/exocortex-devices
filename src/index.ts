@@ -16,7 +16,8 @@ export type { Band, Region } from './eeg.ts';
 
 export { requestSerial, serialTransport, webSerialSupported } from './transports/web-serial.ts';
 export { requestGatt, gattTransport, webBluetoothSupported } from './transports/web-bluetooth.ts';
-export { MemoryByteTransport, MemoryGattTransport, memoryContext, memoryFile } from './transports/memory.ts';
+export { requestMedia, mediaTransport, webMediaSupported } from './transports/web-media.ts';
+export { MemoryByteTransport, MemoryGattTransport, MemoryMediaTransport, MemoryAudioInput, memoryContext, memoryFile } from './transports/memory.ts';
 
 export {
   openbciCyton, makeCytonDriver, CytonParser, encodeCytonPacket, readBanner, cytonDescriptor, CYTON_NAMES, CYTON_DAISY_NAMES, uvPerCount,
@@ -30,6 +31,7 @@ export { fit, readFit, fitDescriptor } from './drivers/fit.ts';
 export { gpx, readGpx, gpxDescriptor } from './drivers/gpx.ts';
 export { appleHealthExport, readHealthExport, parseHealthDate, appleHealthExportDescriptor } from './drivers/apple-health-export.ts';
 export { csv, readCsv, csvFields, csvDescriptor } from './drivers/csv.ts';
+export { mediaAudioHeadset, mediaAudioClipMic, makeMediaAudioDriver, headsetDescriptor, clipMicDescriptor, levelOf, toPcm16, fromPcm16, AUDIO_RATE, AUDIO_MIME } from './drivers/media-audio.ts';
 export { exocortexCapDescriptor } from './drivers/exocortex-cap.ts';
 export { fileFrom, stableId, uuid } from './util.ts';
 

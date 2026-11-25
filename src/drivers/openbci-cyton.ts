@@ -13,7 +13,7 @@
 // 'b' start, 'c' / 'C' remove / attach the Daisy, 'z{ch}{p}{n}Z' lead-off (impedance) test on a channel.
 
 import type { ByteTransport, Connection, Descriptor, Driver, OpenContext } from '../contract.ts';
-import { Counter, ascii, chunk, columns, concatBytes, emitter, event, int16be, int24be, prov } from '../util.ts';
+import { Counter, ascii, chunk, columns, concatBytes, eegQuality, emitter, event, int16be, int24be, prov } from '../util.ts';
 
 export const CYTON_NAMES = ['Fp1', 'Fp2', 'C3', 'C4', 'P7', 'P8', 'O1', 'O2'];
 /** the default 10-20 positions of a Cyton + Daisy (BrainFlow's default montage): 1-8 on the Cyton, 9-16 on the Daisy */
@@ -185,8 +185,9 @@ async function openCyton(t: ByteTransport, ctx: OpenContext, daisy: boolean, des
     const now = ctx.now();
     if (rows.length) {
       const n = rows.length;
+      const data = columns(rows, nCh);
       emit(chunk('eeg', p({ firmware: info.firmware }), { t0: now - (n * 1000) / fs, receivedAt: now, clock: 'host', seq, uncertaintyMs: 100 },
-        fs, names, 'uV', columns(rows, nCh), dropped ? { dropped } : undefined));
+        fs, names, 'uV', data, { quality: eegQuality(data, 4.5e6 / gain), ...(dropped ? { dropped } : {}) }));
       seq += n;
       rows = [];
       dropped = 0;

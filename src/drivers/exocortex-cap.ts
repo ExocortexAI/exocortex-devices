@@ -24,9 +24,9 @@ export const exocortexCapDescriptor: Descriptor = {
     { id: 'marker', kind: 'marker', label: 'Marks', shape: 'events', defaultOn: true },
   ],
   actions: [
-    { id: 'start', label: 'Start' },
-    { id: 'stop', label: 'Stop', safing: true },
-    { id: 'impedance', label: 'Contact check' },
+    { id: 'start', label: 'Start the helmet' },
+    { id: 'stop', label: 'Stop the helmet', safing: true },
+    { id: 'impedance', label: 'Contact check', args: { on: { type: 'boolean', label: 'On' }, hz: { type: 'number', label: 'Tone (Hz)', min: 1, max: 1000 } } },
     { id: 'mark', label: 'Mark this moment', args: { label: { type: 'string', label: 'Label' } } },
   ],
   routes: [

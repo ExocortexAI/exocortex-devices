@@ -14,11 +14,12 @@ import { appleHealthExport } from './drivers/apple-health-export.ts';
 import { csv } from './drivers/csv.ts';
 import { appleHealthDriver } from './drivers/apple-health.ts';
 import { healthConnectDriver } from './drivers/health-connect.ts';
+import { mediaAudioHeadset, mediaAudioClipMic } from './drivers/media-audio.ts';
 
 // each driver is typed by its own transport; the registry holds them as the contract's general Driver
 export const builtinDrivers: readonly Driver[] = [
   openbciCyton, openbciCytonDaisy, openbciGanglion, bleHeartRate, polarH10, appleHealthDriver, healthConnectDriver,
-  edf, fit, gpx, appleHealthExport, csv,
+  mediaAudioHeadset, mediaAudioClipMic, edf, fit, gpx, appleHealthExport, csv,
 ] as unknown as Driver[];
 
 const extra: Driver[] = [];

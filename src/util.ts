@@ -193,6 +193,21 @@ export function chunk(
   return { shape: 'samples', channel, prov: p, time, rateHz, names, unit, data, ...more };
 }
 
+/**
+ * Per-signal quality of an EEG chunk in µV, from the samples alone: `railed` when a sample sits at the amplifier's
+ * limit (`railUv`, an open input pulled to a rail), `flat` when it does not move (under 0.5 µV standard deviation: a
+ * shorted or switched-off input), `noisy` past 150 µV (movement, a loose contact, mains), else `ok`.
+ */
+export function eegQuality(data: Float32Array[], railUv: number): ('ok' | 'flat' | 'railed' | 'noisy')[] {
+  return data.map((row) => {
+    if (!row.length) return 'ok';
+    let s = 0, ss = 0, peak = 0;
+    for (const x of row) { s += x; ss += x * x; const a = Math.abs(x); if (a > peak) peak = a; }
+    const m = s / row.length, sd = Math.sqrt(Math.max(0, ss / row.length - m * m));
+    return peak >= railUv * 0.95 ? 'railed' : sd < 0.5 ? 'flat' : sd > 150 ? 'noisy' : 'ok';
+  });
+}
+
 /** a stable short hash (FNV-1a, 52 bits as hex) for ids synthesized from a record's own fields */
 export function stableId(s: string): string {
   let h1 = 0x811c9dc5, h2 = 0x01000193;
