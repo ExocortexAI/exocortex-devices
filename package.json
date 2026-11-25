@@ -5,13 +5,45 @@
   "license": "Apache-2.0",
   "type": "module",
   "sideEffects": false,
-  "exports": { ".": "./src/index.ts", "./*": "./src/*" },
-  "files": ["src", "examples", "README.md", "CONTRIBUTING.md", "LICENSE"],
-  "keywords": ["eeg", "openbci", "web-serial", "web-bluetooth", "heart-rate", "polar", "edf", "fit", "gpx", "apple-health", "wearables"],
-  "engines": { "node": ">=24" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "files": [
+    "src",
+    "examples",
+    "README.md",
+    "CONTRIBUTING.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "eeg",
+    "openbci",
+    "web-serial",
+    "web-bluetooth",
+    "heart-rate",
+    "polar",
+    "edf",
+    "fit",
+    "gpx",
+    "apple-health",
+    "wearables"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "test": "node --test test/*.test.ts",
     "check": "tsc --noEmit -p .",
-    "example": "vite examples"
+    "example": "npx --yes vite@7.3.7 examples"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ExocortexAI/exocortex-devices.git"
+  },
+  "homepage": "https://github.com/ExocortexAI/exocortex-devices",
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "5.9.3"
   }
 }
