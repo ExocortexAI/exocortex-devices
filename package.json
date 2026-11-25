@@ -1,0 +1,9 @@
+{
+  "name": "@exocortex/devices",
+  "version": "0.1.0",
+  "description": "Pair any body device, health source or custom sensor through one contract: descriptors, drivers, transports and records with provenance. OpenBCI, BLE heart rate, Polar H10, HealthKit, Health Connect, files.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": { ".": "./src/index.ts", "./*": "./src/*" },
+  "scripts": { "test": "node --test test/*.test.ts" }
+}
