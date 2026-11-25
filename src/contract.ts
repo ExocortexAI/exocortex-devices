@@ -121,6 +121,8 @@ export interface Provenance {
   transport: TransportKind;
   providerRecordId?: string;     // a vendor's record id (HealthKit UUID, Oura id): the key to de-duplicate on
   sourceApp?: string;            // the app that wrote it to a hub (Apple Health's source: "Oura", "Polar Flow")
+  /** made by a simulator (./sim/), not measured: a simulated record never counts as a physical one */
+  simulated?: boolean;
 }
 
 /** time of a record. Observed is when it happened; received is when the app got it. */
